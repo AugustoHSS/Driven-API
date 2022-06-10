@@ -12,6 +12,7 @@ export function EventInfoProvider({ children }) {
 
   if (eventLoading) {
     return (
+
       <Splash loading />
     );
   }
@@ -25,7 +26,7 @@ export function EventInfoProvider({ children }) {
 
   return (
     <EventInfoContext.Provider value={{ eventInfo: event, eventInfoError: eventError }}>
-      { children }
+      {children}
     </EventInfoContext.Provider>
   );
 }
