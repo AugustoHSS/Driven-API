@@ -27,10 +27,11 @@ export default function Oauth() {
         code: CODE,
       });
 
-      setUserData(data);
+      setUserData('passei');
       toast('Login com GitHub realizado com sucesso!');
       navigate('/dashboard');
     } catch (error) {
+      console.log(error);
       toast(error.response.data);
       navigate('/');
     }
