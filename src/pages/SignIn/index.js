@@ -34,7 +34,7 @@ export default function SignIn() {
 
   function handleGithubOauth() {
     window.location.replace(
-      `${process.env.REACT_APP_GHAUTH_CLIENT_BASE_URL}?client_id=${process.env.REACT_APP_GHAUTH_CLIENT_ID}`
+      'https://github.com/login/oauth/authorize?client_id=5dc43e9cd355e540d896'
     );
   }
 
