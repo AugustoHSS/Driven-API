@@ -24,6 +24,7 @@ export default function SignIn() {
   const { loadingSignIn, signIn } = useSignIn();
 
   const { eventInfo } = useContext(EventInfoContext);
+
   const { setUserData } = useContext(UserContext);
 
   const navigate = useNavigate();
