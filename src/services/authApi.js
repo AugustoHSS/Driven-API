@@ -6,6 +6,5 @@ export async function signIn(email, password) {
 }
 
 export async function loginGitHub(data) {
-  console.log(data);
   return await api.post('/auth/sign-in/oauth/github', data);
 }
