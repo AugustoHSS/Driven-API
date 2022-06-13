@@ -33,7 +33,7 @@ export default function SignIn() {
   }, []);
 
   function handleGithubOauth() {
-    window.location.replace('https://github.com/login/oauth/authorize?client_id=5dc43e9cd355e540d896%27');
+    window.location.replace('https://github.com/login/oauth/authorize?client_id=5dc43e9cd355e540d896');
   }
 
   async function submit(event) {
