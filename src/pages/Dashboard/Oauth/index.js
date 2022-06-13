@@ -26,12 +26,11 @@ export default function Oauth() {
       const { data } = await authApi.loginGitHub({
         code: CODE,
       });
-
-      setUserData('passei');
+      console.log(data);
+      setUserData(data);
       toast('Login com GitHub realizado com sucesso!');
       navigate('/dashboard');
     } catch (error) {
-      console.log(error);
       toast(error.response.data);
       navigate('/');
     }
