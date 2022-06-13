@@ -12,7 +12,6 @@ export default function Oauth() {
 
   useEffect(() => {
     let CODE = paramsLocation.code;
-
     if (CODE) {
       gitHubAccessToken(CODE);
     }
@@ -27,7 +26,7 @@ export default function Oauth() {
       const { data } = await authApi.loginGitHub({
         code: CODE,
       });
-
+      console.log(data);
       setUserData(data);
       toast('Login com GitHub realizado com sucesso!');
       navigate('/dashboard');
