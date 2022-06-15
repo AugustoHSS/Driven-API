@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useReservation from '../../../hooks/api/useReservation';
-import { Container, TitlePage, Content, NotPaid, EventDateButton } from './style';
+import { Container, TitlePage, Content, NotPaid, EventDateButton, EventBorder, EventPlace, EventBox, Events } from './style';
 
 export default function Activities() {
   const { reservation } = useReservation();
@@ -38,6 +38,20 @@ export default function Activities() {
               {day.weekDay}, {day.monthDay}
             </EventDateButton>
           ))}
+          <Events>
+            <EventBox>
+              <EventPlace>Auditório Principal</EventPlace>
+              <EventBorder></EventBorder>
+            </EventBox>
+            <EventBox>
+              <EventPlace>Auditório Lateral</EventPlace>
+              <EventBorder></EventBorder>
+            </EventBox>
+            <EventBox>
+              <EventPlace>Sala de Workshop</EventPlace>
+              <EventBorder></EventBorder>
+            </EventBox>
+          </Events>
         </>
       )}
     </Container>

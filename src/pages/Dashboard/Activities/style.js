@@ -52,4 +52,29 @@ const EventDateButton = styled.button`
 
 `;
 
-export { Container, TitlePage, Content, NotPaid, EventDateButton };
+const EventBorder = styled.div`
+  width: 100%;
+  min-height: 391px;
+  border: 1px solid #D7D7D7;
+`;
+
+const EventPlace = styled.h2`
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-style: normal;
+  font-size: 17px;
+  line-height: 20px;
+
+  text-align: center;
+  margin: 60px 0 13px 0;
+  color: #7B7B7B;
+`;
+
+const EventBox = styled.div`
+  width: 288px;
+`;
+
+const Events = styled.div`
+  display: flex;
+`;
+
+export { Container, TitlePage, Content, NotPaid, EventDateButton, EventBorder, EventPlace, EventBox, Events };
