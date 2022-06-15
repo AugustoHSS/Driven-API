@@ -89,7 +89,7 @@ export default function Checkout() {
 
   if (reservation === null) {
     return (
-      <h1>carregando</h1>
+      <h1>carregan3do</h1>
     );
   } else {
     return (

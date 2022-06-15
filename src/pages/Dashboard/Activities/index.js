@@ -1,10 +1,16 @@
-/* eslint-disable indent */
+import { useState } from 'react';
 import useReservation from '../../../hooks/api/useReservation';
-import { Container, TitlePage, Content, NotPaid } from './style';
+import { Container, TitlePage, Content, NotPaid, EventDateButton } from './style';
 
 export default function Activities() {
   const { reservation } = useReservation();
-
+  const [eventDate, setEventDate] = useState(
+    [
+      { id: 1, monthDay: '22/10', weekDay: 'Sexta' },
+      { id: 2, monthDay: '23/10', weekDay: 'Sábado' },
+      { id: 3, monthDay: '24/10', weekDay: 'Domingo' }
+    ]);
+  const [selectedDate, setSelectedDate] = useState(1);
   return (
     <Container>
       <TitlePage>Escolha de atividades</TitlePage>
@@ -23,7 +29,16 @@ export default function Activities() {
           </NotPaid>
         </Content>
       ) : (
-        <>INSIRAM A PAGINA DE ATIVIDADES AQUI PESSOAL</>
+        <>
+          {eventDate.map((day) => (
+            <EventDateButton
+              key={day.id}
+              isSelected={day.id === selectedDate}
+              onClick={() => setSelectedDate(day.id)}>
+              {day.weekDay}, {day.monthDay}
+            </EventDateButton>
+          ))}
+        </>
       )}
     </Container>
   );

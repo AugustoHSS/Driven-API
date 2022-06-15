@@ -20,8 +20,6 @@ export default function Card({
   const defaultHotelUrl = 'https://ftnnews.com/images/stories/hotels/Hotel-construction.jpg';
 
   function handleSelection(id) {
-    if (hotelSelected === id) return setHotelSelected(null);
-
     setHotelSelected(id);
   }
 

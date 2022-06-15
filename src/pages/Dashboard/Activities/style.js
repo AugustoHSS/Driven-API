@@ -39,4 +39,17 @@ const NotPaid = styled.p`
   }
 `;
 
-export { Container, TitlePage, Content, NotPaid };
+const EventDateButton = styled.button`
+  border: none;
+  width: 131px;
+  height: 37px;
+
+  cursor: pointer;
+  background-color: ${(props) => (props.isSelected ? '#FFD37D' : '#E0E0E0')};
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  margin: 30px 17px 0 0;
+
+`;
+
+export { Container, TitlePage, Content, NotPaid, EventDateButton };
