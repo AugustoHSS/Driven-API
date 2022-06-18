@@ -49,13 +49,14 @@ const EventDateButton = styled.button`
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.25);
   border-radius: 4px;
   margin: 30px 17px 0 0;
-
 `;
 
 const EventBorder = styled.div`
   width: 100%;
   min-height: 391px;
-  border: 1px solid #D7D7D7;
+  border: 1px solid #d7d7d7;
+
+  padding: 0 10px 10px 10px;
 `;
 
 const EventPlace = styled.h2`
@@ -66,7 +67,7 @@ const EventPlace = styled.h2`
 
   text-align: center;
   margin: 60px 0 13px 0;
-  color: #7B7B7B;
+  color: #7b7b7b;
 `;
 
 const EventBox = styled.div`
@@ -77,4 +78,102 @@ const Events = styled.div`
   display: flex;
 `;
 
-export { Container, TitlePage, Content, NotPaid, EventDateButton, EventBorder, EventPlace, EventBox, Events };
+const ActivityContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-top: 10px solid white;
+
+  padding: 10px;
+
+  height: ${(props) => props.durationTime && `${props.durationTime * 40}px`};
+
+  background: #f1f1f1;
+`;
+
+const ActivityInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  height: 100%;
+  width: 180px;
+`;
+
+const ActivityName = styled.div`
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 14px;
+
+  color: #343434;
+`;
+
+const ActivityTime = styled.div`
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14px;
+
+  margin-top: 6px;
+
+  color: #343434;
+`;
+
+const ActivityDivider = styled.hr`
+  border: 1px solid #cfcfcf;
+
+  height: 100%;
+`;
+
+const ActivityIconContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  width: 50px;
+
+  cursor: pointer;
+`;
+
+const CapacityCounter = styled.div`
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 9px;
+  line-height: 11px;
+
+  margin-left: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: ${(props) => (props.capacityColor === 0 ? '#CC6666' : '#078632')};
+
+  width: 50px;
+`;
+
+export {
+  Container,
+  TitlePage,
+  Content,
+  NotPaid,
+  EventDateButton,
+  EventBorder,
+  EventPlace,
+  EventBox,
+  Events,
+  ActivityContainer,
+  ActivityInfo,
+  ActivityName,
+  ActivityTime,
+  ActivityDivider,
+  ActivityIconContainer,
+  CapacityCounter,
+};
