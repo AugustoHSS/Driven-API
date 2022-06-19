@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import useReservation from '../../../hooks/api/useReservation';
 import useActivities from '../../../hooks/api/useActivities';
+import UserContext from '../../../contexts/UserContext';
 import dayjs from 'dayjs';
 import { BiLogIn } from 'react-icons/bi';
 import { MdOutlineCancel } from 'react-icons/md';
+import { FaRegCheckCircle } from 'react-icons/fa';
 import {
   Container,
   TitlePage,
@@ -28,15 +30,62 @@ export default function Activities() {
   const { activities } = useActivities();
   const [activitiesDate, setActivitiesDate] = useState(['Sábado, 22/10']);
   const [activitiesDay, setActivitiesDay] = useState(null);
+  const [userActivities, setUserActivities] = useState({});
   const [selectedDate, setSelectedDate] = useState(0);
+  const { userData } = useContext(UserContext);
 
   useEffect(() => {
     if (activities) {
       setActivitiesDate(Object.keys(activities));
-
       setActivitiesDay(activities[activitiesDate[selectedDate]]);
+      handleIsUserSubscribed(activities);
     }
   }, [activities, selectedDate]);
+
+  function handleActivitySelection(activityId) {
+    if (userActivities[activityId] === true)
+      userActivities[activityId] = false;
+
+    else
+      userActivities[activityId] = true;
+    
+    try {
+      
+    } catch (error) {
+      
+    }
+    
+    setUserActivities({ ...userActivities });
+  }
+
+  function handleIsUserSubscribed(activitiesRaw) {
+    const activitiesDays = [];
+    for (const date in activitiesRaw)
+      activitiesDays.push(activitiesRaw[date]);
+    
+    const userActivitiesRaw = {};
+    activitiesDays.forEach(activities => {
+      for (let i = 0; i < activities.length; i++) {
+        userActivitiesRaw[activities[i].id] = activities[i].ActivityReservation;
+      }
+    });
+
+    userActivitiesLoop: for (const activityReservations in userActivitiesRaw) {
+      if (userActivitiesRaw[activityReservations].length === 0) {
+        userActivitiesRaw[activityReservations] = false;
+        continue;
+      }
+
+      for (let i = 0; i < userActivitiesRaw[activityReservations].length; i++) {
+        const { userId, activityId } = userActivitiesRaw[activityReservations][i];
+        if (userId === userData.user.id) {
+          userActivitiesRaw[activityId] = true;
+          continue userActivitiesLoop;
+        }
+      }
+    }
+    setUserActivities({ ...userActivities, ...userActivitiesRaw });
+  }
 
   return (
     <Container>
@@ -69,7 +118,7 @@ export default function Activities() {
                 {activitiesDay
                   ?.filter((activityDay) => activityDay.EventPlace.name === 'Auditório Principal')
                   .map((activityDay) => (
-                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30}>
+                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30} userSubscribed={userActivities[activityDay.id]}>
                       <ActivityInfo>
                         <ActivityName>{activityDay.name}</ActivityName>
                         <ActivityTime>
@@ -80,12 +129,19 @@ export default function Activities() {
 
                       <ActivityDivider />
 
-                      <ActivityIconContainer>
-                        {activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
-                          <MdOutlineCancel size={23} color="#CC6666" />
-                        ) : (
-                          <BiLogIn size={23} color="#078632" />
-                        )}
+                      <ActivityIconContainer 
+                        capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        onClick={() => handleActivitySelection(activityDay.id)}
+                      >
+                        {
+                          userActivities[activityDay.id] ?
+                            <FaRegCheckCircle size={23} color="#078632" />
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
+                              <MdOutlineCancel size={23} color="#CC6666" />
+                            ) : (
+                              <BiLogIn size={23} color="#078632" />
+                            )}
 
                         <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
                           {activityDay.capacity - activityDay.ActivityReservation.length === 0
@@ -103,7 +159,7 @@ export default function Activities() {
                 {activitiesDay
                   ?.filter((activityDay) => activityDay.EventPlace.name === 'Auditório Lateral')
                   .map((activityDay) => (
-                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30}>
+                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30} userSubscribed={userActivities[activityDay.id]}>
                       <ActivityInfo>
                         <ActivityName>{activityDay.name}</ActivityName>
                         <ActivityTime>
@@ -114,12 +170,19 @@ export default function Activities() {
 
                       <ActivityDivider />
 
-                      <ActivityIconContainer>
-                        {activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
-                          <MdOutlineCancel size={23} color="#CC6666" />
-                        ) : (
-                          <BiLogIn size={23} color="#078632" />
-                        )}
+                      <ActivityIconContainer 
+                        capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        onClick={() => handleActivitySelection(activityDay.id)}
+                      >
+                        {
+                          userActivities[activityDay.id] ?
+                            <FaRegCheckCircle size={23} color="#078632"/>
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
+                              <MdOutlineCancel size={23} color="#CC6666" />
+                            ) : (
+                              <BiLogIn size={23} color="#078632" />
+                            )}
 
                         <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
                           {activityDay.capacity - activityDay.ActivityReservation.length === 0
@@ -137,7 +200,7 @@ export default function Activities() {
                 {activitiesDay
                   ?.filter((activityDay) => activityDay.EventPlace.name === 'Sala de Workshop')
                   .map((activityDay) => (
-                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30}>
+                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30} userSubscribed={userActivities[activityDay.id]}>
                       <ActivityInfo>
                         <ActivityName>{activityDay.name}</ActivityName>
                         <ActivityTime>
@@ -148,12 +211,19 @@ export default function Activities() {
 
                       <ActivityDivider />
 
-                      <ActivityIconContainer>
-                        {activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
-                          <MdOutlineCancel size={23} color="#CC6666" />
-                        ) : (
-                          <BiLogIn size={23} color="#078632" />
-                        )}
+                      <ActivityIconContainer 
+                        capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        onClick={() => handleActivitySelection(activityDay.id)}
+                      >
+                        {
+                          userActivities[activityDay.id] ?
+                            <FaRegCheckCircle size={23} color="#078632"/>
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
+                              <MdOutlineCancel size={23} color="#CC6666" />
+                            ) : (
+                              <BiLogIn size={23} color="#078632" />
+                            )}
 
                         <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
                           {activityDay.capacity - activityDay.ActivityReservation.length === 0

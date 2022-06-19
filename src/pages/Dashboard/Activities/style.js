@@ -89,7 +89,7 @@ const ActivityContainer = styled.div`
 
   height: ${(props) => props.durationTime && `${props.durationTime * 40}px`};
 
-  background: #f1f1f1;
+  background: ${(props) => (props.userSubscribed ? '#D0FFDB' : '#f1f1f1')};
 `;
 
 const ActivityInfo = styled.div`
@@ -139,6 +139,7 @@ const ActivityIconContainer = styled.div`
   width: 50px;
 
   cursor: pointer;
+  pointer-events: ${(props) => (props.capacity ? 'auto' : 'none')};
 `;
 
 const CapacityCounter = styled.div`
