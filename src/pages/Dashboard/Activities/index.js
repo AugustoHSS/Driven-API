@@ -52,11 +52,9 @@ export default function Activities() {
     try {
       await activityApi.updateActivity(token, activityId);
       setUserActivities({ ...userActivities });
-    } catch (error) {
-      console.log(error.response);
-
+    } catch (error) {      
       if (error.response.data.message === 'activities time conflict')
-        toast('Você já possui uma atividade neste horário!');
+        toast('Você já está inscrito em uma atividade neste horário!');
       
       userActivities[activityId] = !(userActivities[activityId]);
     }
@@ -87,6 +85,7 @@ export default function Activities() {
           continue userActivitiesLoop;
         }
       }
+      userActivitiesRaw[activityReservations] = false;
     }
     setUserActivities({ ...userActivities, ...userActivitiesRaw });
   }
@@ -131,12 +130,14 @@ export default function Activities() {
                         </ActivityTime>
                       </ActivityInfo>
 
-                      <ActivityDivider />
+                      <ActivityDivider userSubscribed={userActivities[activityDay.id]}/>
 
                       <ActivityIconContainer 
                         capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        userSubscribed={userActivities[activityDay.id]}
                         onClick={() => handleActivitySelection(activityDay.id)}
                       >
+
                         {
                           userActivities[activityDay.id] ?
                             <FaRegCheckCircle size={23} color="#078632" />
@@ -147,7 +148,7 @@ export default function Activities() {
                               <BiLogIn size={23} color="#078632" />
                             )}
 
-                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
+                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length} userSubscribed={userActivities[activityDay.id]}>
                           {userActivities[activityDay.id] ?
                             'Inscrito'
                             :
@@ -175,10 +176,11 @@ export default function Activities() {
                         </ActivityTime>
                       </ActivityInfo>
 
-                      <ActivityDivider />
+                      <ActivityDivider userSubscribed={userActivities[activityDay.id]}/>
 
                       <ActivityIconContainer 
                         capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        userSubscribed={userActivities[activityDay.id]}
                         onClick={() => handleActivitySelection(activityDay.id)}
                       >
                         {
@@ -191,10 +193,13 @@ export default function Activities() {
                               <BiLogIn size={23} color="#078632" />
                             )}
 
-                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
-                          {activityDay.capacity - activityDay.ActivityReservation.length === 0
-                            ? 'Esgotado'
-                            : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
+                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length} userSubscribed={userActivities[activityDay.id]}>
+                          {userActivities[activityDay.id] ?
+                            'Inscrito'
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0
+                              ? 'Esgotado'
+                              : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
                         </CapacityCounter>
                       </ActivityIconContainer>
                     </ActivityContainer>
@@ -216,10 +221,11 @@ export default function Activities() {
                         </ActivityTime>
                       </ActivityInfo>
 
-                      <ActivityDivider />
+                      <ActivityDivider userSubscribed={userActivities[activityDay.id]}/>
 
                       <ActivityIconContainer 
                         capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        userSubscribed={userActivities[activityDay.id]}
                         onClick={() => handleActivitySelection(activityDay.id)}
                       >
                         {
@@ -232,10 +238,12 @@ export default function Activities() {
                               <BiLogIn size={23} color="#078632" />
                             )}
 
-                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
-                          {activityDay.capacity - activityDay.ActivityReservation.length === 0
-                            ? 'Esgotado'
-                            : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
+                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length} userSubscribed={userActivities[activityDay.id]}>
+                          {userActivities[activityDay.id] ?
+                            'Inscrito'
+                            : activityDay.capacity - activityDay.ActivityReservation.length === 0
+                              ? 'Esgotado'
+                              : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
                         </CapacityCounter>
                       </ActivityIconContainer>
                     </ActivityContainer>
