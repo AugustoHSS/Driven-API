@@ -83,11 +83,12 @@ const ActivityContainer = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  border-top: 10px solid white;
+  border-top: 10px solid #FFF;
+  border-radius: 15px 15px 5px 5px;
 
   padding: 10px;
 
-  height: ${(props) => props.durationTime && `${props.durationTime * 40}px`};
+  height: ${(props) => props.durationTime && `${props.durationTime * 40 + 5*props.durationTime}px`};
 
   background: ${(props) => (props.userSubscribed ? '#D0FFDB' : '#f1f1f1')};
 `;
