@@ -31,24 +31,30 @@ import {
 export default function Activities() {
   const { reservation } = useReservation();
   const { activities } = useActivities();
+  const [ activitiesLoaded, setActivitiesLoaded ] = useState(null);
   const [activitiesDate, setActivitiesDate] = useState(['Sábado, 22/10']);
   const [activitiesDay, setActivitiesDay] = useState(null);
-  const [userActivities, setUserActivities] = useState({});
   const [selectedDate, setSelectedDate] = useState(0);
+  const [userActivities, setUserActivities] = useState({});
   const { userData } = useContext(UserContext);
   const token = useToken();
 
   useEffect(() => {
-    if (activities) {
+    if (activities && activitiesLoaded === null) {
+      setActivitiesLoaded({ ...activities });
       setActivitiesDate(Object.keys(activities));
       setActivitiesDay(activities[activitiesDate[selectedDate]]);
       handleIsUserSubscribed(activities);
+    }
+
+    if (activitiesLoaded) {
+      setActivitiesDate(Object.keys(activitiesLoaded));
+      setActivitiesDay(activitiesLoaded[activitiesDate[selectedDate]]);
     }
   }, [activities, selectedDate]);
 
   async function handleActivitySelection(activityId) {
     userActivities[activityId] = !(userActivities[activityId]);
-    
     try {
       await activityApi.updateActivity(token, activityId);
       setUserActivities({ ...userActivities });
@@ -66,9 +72,9 @@ export default function Activities() {
       activitiesDays.push(activitiesRaw[date]);
     
     const userActivitiesRaw = {};
-    activitiesDays.forEach(activities => {
-      for (let i = 0; i < activities.length; i++) {
-        userActivitiesRaw[activities[i].id] = activities[i].ActivityReservation;
+    activitiesDays.forEach(activitiesInDay => {
+      for (let i = 0; i < activitiesInDay.length; i++) {
+        userActivitiesRaw[activitiesInDay[i].id] = activitiesInDay[i].ActivityReservation;
       }
     });
 
