@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import useReservation from '../../../hooks/api/useReservation';
 import useActivities from '../../../hooks/api/useActivities';
+import useToken from '../../../hooks/useToken';
+import UserContext from '../../../contexts/UserContext';
+import * as activityApi from '../../../services/activityApi';
+import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { BiLogIn } from 'react-icons/bi';
 import { MdOutlineCancel } from 'react-icons/md';
+import { FaRegCheckCircle } from 'react-icons/fa';
 import {
   Container,
   TitlePage,
@@ -28,15 +33,62 @@ export default function Activities() {
   const { activities } = useActivities();
   const [activitiesDate, setActivitiesDate] = useState(['Sábado, 22/10']);
   const [activitiesDay, setActivitiesDay] = useState(null);
+  const [userActivities, setUserActivities] = useState({});
   const [selectedDate, setSelectedDate] = useState(0);
+  const { userData } = useContext(UserContext);
+  const token = useToken();
 
   useEffect(() => {
     if (activities) {
       setActivitiesDate(Object.keys(activities));
-
       setActivitiesDay(activities[activitiesDate[selectedDate]]);
+      handleIsUserSubscribed(activities);
     }
   }, [activities, selectedDate]);
+
+  async function handleActivitySelection(activityId) {
+    userActivities[activityId] = !(userActivities[activityId]);
+    
+    try {
+      await activityApi.updateActivity(token, activityId);
+      setUserActivities({ ...userActivities });
+    } catch (error) {      
+      if (error.response.data.message === 'activities time conflict')
+        toast('Você já está inscrito em uma atividade neste horário!');
+      
+      userActivities[activityId] = !(userActivities[activityId]);
+    }
+  }
+
+  function handleIsUserSubscribed(activitiesRaw) {
+    const activitiesDays = [];
+    for (const date in activitiesRaw)
+      activitiesDays.push(activitiesRaw[date]);
+    
+    const userActivitiesRaw = {};
+    activitiesDays.forEach(activities => {
+      for (let i = 0; i < activities.length; i++) {
+        userActivitiesRaw[activities[i].id] = activities[i].ActivityReservation;
+      }
+    });
+
+    userActivitiesLoop: for (const activityReservations in userActivitiesRaw) {
+      if (userActivitiesRaw[activityReservations].length === 0) {
+        userActivitiesRaw[activityReservations] = false;
+        continue;
+      }
+
+      for (let i = 0; i < userActivitiesRaw[activityReservations].length; i++) {
+        const { userId, activityId } = userActivitiesRaw[activityReservations][i];
+        if (userId === userData.user.id) {
+          userActivitiesRaw[activityId] = true;
+          continue userActivitiesLoop;
+        }
+      }
+      userActivitiesRaw[activityReservations] = false;
+    }
+    setUserActivities({ ...userActivities, ...userActivitiesRaw });
+  }
 
   return (
     <Container>
@@ -69,7 +121,7 @@ export default function Activities() {
                 {activitiesDay
                   ?.filter((activityDay) => activityDay.EventPlace.name === 'Auditório Principal')
                   .map((activityDay) => (
-                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30}>
+                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30} userSubscribed={userActivities[activityDay.id]}>
                       <ActivityInfo>
                         <ActivityName>{activityDay.name}</ActivityName>
                         <ActivityTime>
@@ -78,19 +130,31 @@ export default function Activities() {
                         </ActivityTime>
                       </ActivityInfo>
 
-                      <ActivityDivider />
+                      <ActivityDivider userSubscribed={userActivities[activityDay.id]}/>
 
-                      <ActivityIconContainer>
-                        {activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
-                          <MdOutlineCancel size={23} color="#CC6666" />
-                        ) : (
-                          <BiLogIn size={23} color="#078632" />
-                        )}
+                      <ActivityIconContainer 
+                        capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        userSubscribed={userActivities[activityDay.id]}
+                        onClick={() => handleActivitySelection(activityDay.id)}
+                      >
 
-                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
-                          {activityDay.capacity - activityDay.ActivityReservation.length === 0
-                            ? 'Esgotado'
-                            : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
+                        {
+                          userActivities[activityDay.id] ?
+                            <FaRegCheckCircle size={23} color="#078632" />
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
+                              <MdOutlineCancel size={23} color="#CC6666" />
+                            ) : (
+                              <BiLogIn size={23} color="#078632" />
+                            )}
+
+                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length} userSubscribed={userActivities[activityDay.id]}>
+                          {userActivities[activityDay.id] ?
+                            'Inscrito'
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0
+                              ? 'Esgotado'
+                              : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
                         </CapacityCounter>
                       </ActivityIconContainer>
                     </ActivityContainer>
@@ -103,7 +167,7 @@ export default function Activities() {
                 {activitiesDay
                   ?.filter((activityDay) => activityDay.EventPlace.name === 'Auditório Lateral')
                   .map((activityDay) => (
-                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30}>
+                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30} userSubscribed={userActivities[activityDay.id]}>
                       <ActivityInfo>
                         <ActivityName>{activityDay.name}</ActivityName>
                         <ActivityTime>
@@ -112,19 +176,30 @@ export default function Activities() {
                         </ActivityTime>
                       </ActivityInfo>
 
-                      <ActivityDivider />
+                      <ActivityDivider userSubscribed={userActivities[activityDay.id]}/>
 
-                      <ActivityIconContainer>
-                        {activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
-                          <MdOutlineCancel size={23} color="#CC6666" />
-                        ) : (
-                          <BiLogIn size={23} color="#078632" />
-                        )}
+                      <ActivityIconContainer 
+                        capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        userSubscribed={userActivities[activityDay.id]}
+                        onClick={() => handleActivitySelection(activityDay.id)}
+                      >
+                        {
+                          userActivities[activityDay.id] ?
+                            <FaRegCheckCircle size={23} color="#078632"/>
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
+                              <MdOutlineCancel size={23} color="#CC6666" />
+                            ) : (
+                              <BiLogIn size={23} color="#078632" />
+                            )}
 
-                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
-                          {activityDay.capacity - activityDay.ActivityReservation.length === 0
-                            ? 'Esgotado'
-                            : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
+                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length} userSubscribed={userActivities[activityDay.id]}>
+                          {userActivities[activityDay.id] ?
+                            'Inscrito'
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0
+                              ? 'Esgotado'
+                              : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
                         </CapacityCounter>
                       </ActivityIconContainer>
                     </ActivityContainer>
@@ -137,7 +212,7 @@ export default function Activities() {
                 {activitiesDay
                   ?.filter((activityDay) => activityDay.EventPlace.name === 'Sala de Workshop')
                   .map((activityDay) => (
-                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30}>
+                    <ActivityContainer key={activityDay.id} durationTime={activityDay.duration / 30} userSubscribed={userActivities[activityDay.id]}>
                       <ActivityInfo>
                         <ActivityName>{activityDay.name}</ActivityName>
                         <ActivityTime>
@@ -146,19 +221,29 @@ export default function Activities() {
                         </ActivityTime>
                       </ActivityInfo>
 
-                      <ActivityDivider />
+                      <ActivityDivider userSubscribed={userActivities[activityDay.id]}/>
 
-                      <ActivityIconContainer>
-                        {activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
-                          <MdOutlineCancel size={23} color="#CC6666" />
-                        ) : (
-                          <BiLogIn size={23} color="#078632" />
-                        )}
+                      <ActivityIconContainer 
+                        capacity={activityDay.capacity - activityDay.ActivityReservation.length}
+                        userSubscribed={userActivities[activityDay.id]}
+                        onClick={() => handleActivitySelection(activityDay.id)}
+                      >
+                        {
+                          userActivities[activityDay.id] ?
+                            <FaRegCheckCircle size={23} color="#078632"/>
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0 ? (
+                              <MdOutlineCancel size={23} color="#CC6666" />
+                            ) : (
+                              <BiLogIn size={23} color="#078632" />
+                            )}
 
-                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
-                          {activityDay.capacity - activityDay.ActivityReservation.length === 0
-                            ? 'Esgotado'
-                            : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
+                        <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length} userSubscribed={userActivities[activityDay.id]}>
+                          {userActivities[activityDay.id] ?
+                            'Inscrito'
+                            : activityDay.capacity - activityDay.ActivityReservation.length === 0
+                              ? 'Esgotado'
+                              : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
                         </CapacityCounter>
                       </ActivityIconContainer>
                     </ActivityContainer>

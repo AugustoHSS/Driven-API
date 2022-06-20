@@ -89,7 +89,7 @@ const ActivityContainer = styled.div`
 
   height: ${(props) => props.durationTime && `${props.durationTime * 40}px`};
 
-  background: #f1f1f1;
+  background: ${(props) => (props.userSubscribed ? '#D0FFDB' : '#f1f1f1')};
 `;
 
 const ActivityInfo = styled.div`
@@ -124,7 +124,7 @@ const ActivityTime = styled.div`
 `;
 
 const ActivityDivider = styled.hr`
-  border: 1px solid #cfcfcf;
+  border: ${(props) => (props.userSubscribed ? '1px solid #99E8A1' : '1px solid #cfcfcf')};;
 
   height: 100%;
 `;
@@ -139,6 +139,7 @@ const ActivityIconContainer = styled.div`
   width: 50px;
 
   cursor: pointer;
+  pointer-events: ${(props) => (props.capacity || props.userSubscribed ? 'auto' : 'none')};
 `;
 
 const CapacityCounter = styled.div`
@@ -154,7 +155,7 @@ const CapacityCounter = styled.div`
   align-items: center;
   justify-content: center;
 
-  color: ${(props) => (props.capacityColor === 0 ? '#CC6666' : '#078632')};
+  color: ${(props) => (props.capacityColor !== 0 || props.userSubscribed ? '#078632' : '#CC6666')};
 
   width: 50px;
 `;
