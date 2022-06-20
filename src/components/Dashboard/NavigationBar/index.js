@@ -1,14 +1,17 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { FaFileContract, FaMoneyBill, FaBed, FaCalendarWeek, FaCertificate } from 'react-icons/fa';
+import { BsDoorOpenFill } from 'react-icons/bs';
 import NavigationButton from './NavigationButton';
 import useToken from '../../../hooks/useToken';
 import ReloadContext from '../../../contexts/reloadContext';
 import * as paymentApi from '../../../services/paymentApi';
+import * as authApi from '../../../services/authApi';
 
 export default function NavigationBar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [paymentPath, setPaymentPath] = useState('/dashboard/payment');
   const [hotelPath, setHotelPath] = useState('/dashboard/hotel');
   const [loading, setLoading] = useState(false);
@@ -34,6 +37,12 @@ export default function NavigationBar() {
     setLoading(false);
   }, [reload]);
 
+  function logOut() {
+    const userId = JSON.parse(localStorage.getItem('userData')).user.id;
+    authApi.logOut(userId);
+    localStorage.removeItem('userData');
+    navigate('/');
+  }
   return (
     <Container loading={loading.toString()}>
       <Link to="/dashboard/subscription">
@@ -70,6 +79,12 @@ export default function NavigationBar() {
           <span>Certificado</span>
         </NavigationButton>
       </Link>
+      <div onClick={() => logOut()}>
+        <NavigationButton >
+          <BsDoorOpenFill />
+          <span>Sair</span>
+        </NavigationButton>
+      </div>
     </Container>
   );
 }

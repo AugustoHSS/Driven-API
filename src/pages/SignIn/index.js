@@ -30,6 +30,9 @@ export default function SignIn() {
 
   useEffect(() => {
     setGithubButton(true);
+    if (localStorage.getItem('userData')) {
+      navigate('/dashboard/subscription');
+    }
   }, []);
 
   function handleGithubOauth() {

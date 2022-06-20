@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,8 +21,14 @@ export default function Enroll() {
   const { loadingSignUp, signUp } = useSignUp();
 
   const navigate = useNavigate();
-  
+
   const { eventInfo } = useContext(EventInfoContext);
+
+  useEffect(() => {
+    if (localStorage.getItem('userData')) {
+      navigate('/dashboard/subscription');
+    }
+  }, []);
 
   async function submit(event) {
     event.preventDefault();

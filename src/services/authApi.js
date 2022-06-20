@@ -8,3 +8,7 @@ export async function signIn(email, password) {
 export async function loginGitHub(data) {
   return await api.post('/auth/sign-in/oauth/github', data);
 }
+
+export async function logOut(userId) {
+  return await api.delete('/auth/log-out/' + userId);
+}
