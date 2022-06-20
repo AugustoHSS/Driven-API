@@ -1,7 +1,10 @@
 import { useEffect, useState, useContext } from 'react';
 import useReservation from '../../../hooks/api/useReservation';
 import useActivities from '../../../hooks/api/useActivities';
+import useToken from '../../../hooks/useToken';
 import UserContext from '../../../contexts/UserContext';
+import * as activityApi from '../../../services/activityApi';
+import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { BiLogIn } from 'react-icons/bi';
 import { MdOutlineCancel } from 'react-icons/md';
@@ -33,6 +36,7 @@ export default function Activities() {
   const [userActivities, setUserActivities] = useState({});
   const [selectedDate, setSelectedDate] = useState(0);
   const { userData } = useContext(UserContext);
+  const token = useToken();
 
   useEffect(() => {
     if (activities) {
@@ -42,20 +46,20 @@ export default function Activities() {
     }
   }, [activities, selectedDate]);
 
-  function handleActivitySelection(activityId) {
-    if (userActivities[activityId] === true)
-      userActivities[activityId] = false;
-
-    else
-      userActivities[activityId] = true;
+  async function handleActivitySelection(activityId) {
+    userActivities[activityId] = !(userActivities[activityId]);
     
     try {
-      
+      await activityApi.updateActivity(token, activityId);
+      setUserActivities({ ...userActivities });
     } catch (error) {
+      console.log(error.response);
+
+      if (error.response.data.message === 'activities time conflict')
+        toast('Você já possui uma atividade neste horário!');
       
+      userActivities[activityId] = !(userActivities[activityId]);
     }
-    
-    setUserActivities({ ...userActivities });
   }
 
   function handleIsUserSubscribed(activitiesRaw) {
@@ -144,9 +148,12 @@ export default function Activities() {
                             )}
 
                         <CapacityCounter capacityColor={activityDay.capacity - activityDay.ActivityReservation.length}>
-                          {activityDay.capacity - activityDay.ActivityReservation.length === 0
-                            ? 'Esgotado'
-                            : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
+                          {userActivities[activityDay.id] ?
+                            'Inscrito'
+                            :
+                            activityDay.capacity - activityDay.ActivityReservation.length === 0
+                              ? 'Esgotado'
+                              : activityDay.capacity - activityDay.ActivityReservation.length + ' vagas'}
                         </CapacityCounter>
                       </ActivityIconContainer>
                     </ActivityContainer>
